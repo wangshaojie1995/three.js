@@ -33,7 +33,6 @@ textarea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
-	vertical-align: middle;
 }
 
 	textarea.success {
@@ -68,6 +67,7 @@ textarea, input { outline: none; } /* osx */
 	position: relative;
 	display: block;
 	width: 100%;
+	min-width: 335px;
 }
 
 .TabbedPanel .Tabs {
@@ -76,17 +76,16 @@ textarea, input { outline: none; } /* osx */
 	width: 100%;
 }
 
-.TabbedPanel .Tabs .Tab {
-	padding: 10px;
-	text-transform: uppercase;
-}
+	.TabbedPanel .Tabs .Tab {
+		padding: 10px 9px;
+		text-transform: uppercase;
+	}
 
-.TabbedPanel .Tabs .Panels {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 100%;
-}
+	.TabbedPanel .Panels {
+		position: relative;
+		display: block;
+		width: 100%;
+	}
 
 /* Listbox */
 .Listbox {
@@ -94,7 +93,7 @@ textarea, input { outline: none; } /* osx */
 	background-color: #fff;
 	padding: 0;
 	width: 100%;
-	min-height: 140px;
+	min-height: 180px;
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
@@ -250,6 +249,7 @@ button {
 	border: 0px;
 	margin: 0px; /* GNOME Web */
 	padding: 5px 8px;
+	font-size: 12px;
 	text-transform: uppercase;
 	cursor: pointer;
 	outline: none;
@@ -293,7 +293,7 @@ select {
 #resizer {
 	position: absolute;
 	top: 32px;
-	right: 295px;
+	right: 345px;
 	width: 5px;
 	bottom: 0px;
 	/* background-color: rgba(255,0,0,0.5); */
@@ -304,7 +304,7 @@ select {
 	position: absolute;
 	top: 32px;
 	left: 0;
-	right: 300px;
+	right: 350px;
 	bottom: 0;
 }
 
@@ -317,7 +317,7 @@ select {
 	position: absolute;
 	top: 32px;
 	left: 0;
-	right: 300px;
+	right: 350px;
 	bottom: 0;
 	opacity: 0.9;
 }
@@ -326,7 +326,7 @@ select {
 	position: absolute;
 	top: 32px;
 	left: 0;
-	right: 300px;
+	right: 350px;
 	bottom: 0;
 }
 
@@ -409,7 +409,7 @@ select {
 	right: 0;
 	top: 32px;
 	bottom: 0;
-	width: 300px;
+	width: 350px;
 	background: #eee;
 	overflow: auto;
 }
@@ -425,12 +425,16 @@ select {
 	}
 
 	#sidebar .Row {
-		min-height: 20px;
+		display: flex;
+		align-items: center;
+		min-height: 24px;
 		margin-bottom: 10px;
 	}
 
-	#sidebar canvas {
-		vertical-align: middle;
+	#sidebar .Row .Label {
+
+		width: 120px;
+
 	}
 
 #tabs {
@@ -472,7 +476,7 @@ select {
 	background-color: #fff;
 	padding: 0;
 	width: 100%;
-	height: 140px;
+	height: 180px;
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
@@ -697,4 +701,11 @@ select {
 		background-color: rgba(21,60,94,1);
 	}
 
+}
+
+/* Temporary Chrome fix (#24794) */
+
+[draggable="true"] {
+	transform: translate(0, 0);
+	z-index: 0;
 }

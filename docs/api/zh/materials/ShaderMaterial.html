@@ -81,7 +81,6 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
 			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
 			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
 			[example:webgl_custom_attributes webgl / custom / attributes]<br />
@@ -98,9 +97,6 @@
 			[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
-			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
-			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
-			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
@@ -161,8 +157,8 @@
 		<div>
 			<p>
 				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
-				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
-				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
+				自定义uniforms必须定义为 *ShaderMaterial* 的 *uniforms* 属性，
+				而任何自定义attributes必须通过[page:BufferAttribute]实例来定义。
 				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
 			</p>
 			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
@@ -257,7 +253,7 @@
 this.defaultAttributeValues = {
 	'color': [ 1, 1, 1 ],
 	'uv': [ 0, 0 ],
-	'uv2': [ 0, 0 ]
+	'uv1': [ 0, 0 ]
 };
 			</code>
 
@@ -283,10 +279,8 @@ this.defaultAttributeValues = {
 		<p> 一个有如下属性的对象：
 		<code>
 this.extensions = {
-	derivatives: false, // set to use derivatives
-	fragDepth: false, // set to use fragment depth values
-	drawBuffers: false, // set to use draw buffers
-	shaderTextureLOD: false // set to use shader texture LOD
+	clipCullDistance: false, // set to use vertex shader clipping
+	multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 };
 		</code>
 		</p>
@@ -306,14 +300,18 @@ this.extensions = {
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
-		Defines the GLSL version of custom shader code. Only relevant for WebGL 2 in order to define whether to specify
-		GLSL 3.0 or not. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
+		Defines the GLSL version of custom shader code. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
 		</p>
 
 		<h3>[property:String index0AttributeName]</h3>
 		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
 			将通用顶点索引绑定到属性变量。默认值未定义。
 
+		</p>
+
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Boolean lights]</h3>
@@ -323,14 +321,6 @@ this.extensions = {
 		<h3>[property:Float linewidth]</h3>
 		<p>控制线框宽度。默认值为1。<br /><br />
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>
@@ -380,7 +370,7 @@ this.extensions = {
 		<h2>方法(Methods)</h2>
 		<p>共有方法请参见其基类[page:Material]。</p>
 
-		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
+		<h3>[method:ShaderMaterial clone]()</h3>
 		<p> 创建该材质的一个浅拷贝。需要注意的是，vertexShader和fragmentShader使用<em>引用拷贝</em>；
 			*attributes*的定义也是如此;
 			这意味着，克隆的材质将共享相同的编译[page:WebGLProgram]；

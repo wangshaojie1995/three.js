@@ -11,13 +11,22 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			const params = {
 				color: 0xffffff,
@@ -25,7 +34,10 @@
 				opacity: 1,
 				metalness: 0,
 				roughness: 0,
-				reflectivity: 0.5,
+				ior: 1.5,
+				thickness: 0.01,
+				specularIntensity: 1,
+				specularColor: 0xffffff,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -33,13 +45,13 @@
 
 			let camera, scene, renderer;
 
-			let hdrCubeRenderTarget;
 			let mesh;
 
 			const hdrEquirect = new RGBELoader()
-				.setDataType( THREE.UnsignedByteType )
 				.setPath( 'textures/equirectangular/' )
 				.load( 'royal_esplanade_1k.hdr', function () {
+
+					hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
 					init();
 					render();
@@ -57,7 +69,6 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
@@ -66,12 +77,7 @@
 
 				//
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-				hdrEquirect.dispose();
-				pmremGenerator.dispose();
-
-				scene.background = hdrCubeRenderTarget.texture;
+				scene.background = hdrEquirect;
 
 				//
 
@@ -87,11 +93,13 @@
 					color: params.color,
 					metalness: params.metalness,
 					roughness: params.roughness,
-					reflectivity: params.reflectivity,
+					ior: params.ior,
 					alphaMap: texture,
-					envMap: hdrCubeRenderTarget.texture,
+					envMap: hdrEquirect,
 					envMapIntensity: params.envMapIntensity,
 					transmission: params.transmission, // use material.transmission for glass materials
+					specularIntensity: params.specularIntensity,
+					specularColor: params.specularColor,
 					opacity: params.opacity,
 					side: THREE.DoubleSide,
 					transparent: true
@@ -153,10 +161,34 @@
 
 					} );
 
-				gui.add( params, 'reflectivity', 0, 1, 0.01 )
+				gui.add( params, 'ior', 1, 2, 0.01 )
 					.onChange( function () {
 
-						material.reflectivity = params.reflectivity;
+						material.ior = params.ior;
+						render();
+
+					} );
+
+				gui.add( params, 'thickness', 0, 5, 0.01 )
+					.onChange( function () {
+
+						material.thickness = params.thickness;
+						render();
+
+					} );
+
+				gui.add( params, 'specularIntensity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.specularIntensity = params.specularIntensity;
+						render();
+
+					} );
+
+				gui.addColor( params, 'specularColor' )
+					.onChange( function () {
+
+						material.specularColor.set( params.specularColor );
 						render();
 
 					} );
